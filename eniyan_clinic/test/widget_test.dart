@@ -55,9 +55,9 @@ void main() {
     expect(find.text('Appointments'), findsOneWidget);
     expect(find.text('Facilities'), findsOneWidget);
     expect(find.text('Blog'), findsOneWidget);
-    expect(find.text('Profile'), findsOneWidget);
+    expect(find.text('Peak Flow'), findsOneWidget);
 
-    await tester.tap(find.text('Profile'));
+    await tester.tap(find.byTooltip('Open profile'));
     await tester.pumpAndSettle();
 
     expect(find.text('Rajesh Kumar'), findsOneWidget);

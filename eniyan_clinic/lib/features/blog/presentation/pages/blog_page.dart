@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/widgets/app_feedback.dart';
+import '../../../../shared/widgets/clinic_app_bar.dart';
+import '../../../profile/presentation/notification_navigation.dart';
 
 class BlogAppBar extends StatelessWidget implements PreferredSizeWidget {
   const BlogAppBar({super.key, this.onBack});
@@ -9,33 +11,16 @@ class BlogAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onBack;
 
   @override
-  Size get preferredSize => const Size.fromHeight(58);
+  Size get preferredSize => const Size.fromHeight(72);
 
   @override
   Widget build(BuildContext context) {
-    return AppBar(
-      backgroundColor: AppColors.white,
-      surfaceTintColor: AppColors.white,
-      toolbarHeight: 58,
-      leading: IconButton(
-        onPressed: onBack ?? () => Navigator.of(context).maybePop(),
-        tooltip: 'Back',
-        icon: const Icon(Icons.arrow_back_rounded, color: AppColors.blue),
-      ),
-      title: const Text(
-        'Health & Wellness',
-        style: TextStyle(
-          color: AppColors.ink,
-          fontSize: 18,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-      actions: const [
-        _BlogNotificationButton(),
-        SizedBox(width: 8),
-        _BlogProfileAvatar(),
-        SizedBox(width: 16),
-      ],
+    return ClinicHeader(
+      title: 'Health & Wellness',
+      showBackButton: true,
+      onBack: onBack ?? () => Navigator.of(context).maybePop(),
+      onNotificationTap: () => openNotifications(context),
+      onProfileTap: () => openProfile(context),
     );
   }
 }
@@ -324,8 +309,7 @@ class _BlogNotificationButton extends StatelessWidget {
       clipBehavior: Clip.none,
       children: [
         IconButton(
-          onPressed: () =>
-              showAppMessage(context, 'You have 3 new notifications.'),
+          onPressed: () => openNotifications(context),
           tooltip: 'Notifications',
           icon: const Icon(
             Icons.notifications_none_rounded,
@@ -360,11 +344,16 @@ class _BlogNotificationButton extends StatelessWidget {
 }
 
 class _BlogProfileAvatar extends StatelessWidget {
-  const _BlogProfileAvatar();
+  const _BlogProfileAvatar({required this.onTap});
+
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(11),
+      child: Container(
       width: 34,
       height: 34,
       alignment: Alignment.center,
@@ -372,13 +361,11 @@ class _BlogProfileAvatar extends StatelessWidget {
         color: AppColors.softBlue,
         borderRadius: BorderRadius.circular(11),
       ),
-      child: const Text(
-        'RK',
-        style: TextStyle(
-          color: AppColors.blue,
-          fontSize: 12,
-          fontWeight: FontWeight.w800,
-        ),
+      child: const Icon(
+        Icons.person_outline_rounded,
+        color: AppColors.blue,
+        size: 20,
+      ),
       ),
     );
   }

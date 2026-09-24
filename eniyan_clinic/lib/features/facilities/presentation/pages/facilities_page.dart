@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/widgets/app_feedback.dart';
+import '../../../../shared/widgets/clinic_app_bar.dart';
+import '../../../profile/presentation/notification_navigation.dart';
 
 class FacilitiesAppBar extends StatelessWidget implements PreferredSizeWidget {
   const FacilitiesAppBar({super.key, this.onBack});
@@ -9,33 +11,16 @@ class FacilitiesAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onBack;
 
   @override
-  Size get preferredSize => const Size.fromHeight(58);
+  Size get preferredSize => const Size.fromHeight(72);
 
   @override
   Widget build(BuildContext context) {
-    return AppBar(
-      backgroundColor: AppColors.white,
-      surfaceTintColor: AppColors.white,
-      toolbarHeight: 58,
-      leading: IconButton(
-        onPressed: onBack ?? () => Navigator.of(context).maybePop(),
-        tooltip: 'Back',
-        icon: const Icon(Icons.arrow_back_rounded, color: AppColors.blue),
-      ),
-      title: const Text(
-        'Our Facilities',
-        style: TextStyle(
-          color: AppColors.ink,
-          fontSize: 18,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-      actions: const [
-        _FacilitiesNotificationButton(),
-        SizedBox(width: 8),
-        _FacilitiesProfileAvatar(),
-        SizedBox(width: 16),
-      ],
+    return ClinicHeader(
+      title: 'Our Facilities',
+      showBackButton: true,
+      onBack: onBack ?? () => Navigator.of(context).maybePop(),
+      onNotificationTap: () => openNotifications(context),
+      onProfileTap: () => openProfile(context),
     );
   }
 }
@@ -269,8 +254,7 @@ class _FacilitiesNotificationButton extends StatelessWidget {
       clipBehavior: Clip.none,
       children: [
         IconButton(
-          onPressed: () =>
-              showAppMessage(context, 'You have 3 new notifications.'),
+          onPressed: () => openNotifications(context),
           tooltip: 'Notifications',
           icon: const Icon(
             Icons.notifications_none_rounded,
@@ -305,11 +289,16 @@ class _FacilitiesNotificationButton extends StatelessWidget {
 }
 
 class _FacilitiesProfileAvatar extends StatelessWidget {
-  const _FacilitiesProfileAvatar();
+  const _FacilitiesProfileAvatar({required this.onTap});
+
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(11),
+      child: Container(
       width: 34,
       height: 34,
       alignment: Alignment.center,
@@ -317,13 +306,11 @@ class _FacilitiesProfileAvatar extends StatelessWidget {
         color: AppColors.softBlue,
         borderRadius: BorderRadius.circular(11),
       ),
-      child: const Text(
-        'RK',
-        style: TextStyle(
-          color: AppColors.blue,
-          fontSize: 12,
-          fontWeight: FontWeight.w800,
-        ),
+      child: const Icon(
+        Icons.person_outline_rounded,
+        color: AppColors.blue,
+        size: 20,
+      ),
       ),
     );
   }

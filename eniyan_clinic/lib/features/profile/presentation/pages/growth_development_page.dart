@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../shared/widgets/clinic_app_bar.dart';
 import '../profile_data.dart';
+import '../notification_navigation.dart';
 
 class GrowthDevelopmentPage extends StatefulWidget {
   const GrowthDevelopmentPage({super.key, required this.child});
@@ -53,79 +55,12 @@ class _GrowthAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AppBar(
-      backgroundColor: AppColors.white,
-      surfaceTintColor: AppColors.white,
-      elevation: 0,
-      toolbarHeight: 58,
-      leading: IconButton(
-        onPressed: () => Navigator.of(context).pop(),
-        tooltip: 'Back',
-        icon: const Icon(Icons.arrow_back_rounded, color: AppColors.blue),
-      ),
-      title: const Text(
-        'Growth & Development',
-        style: TextStyle(
-          color: AppColors.ink,
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-      actions: [
-        Stack(
-          clipBehavior: Clip.none,
-          children: [
-            IconButton(
-              onPressed: () {},
-              tooltip: 'Notifications',
-              icon: const Icon(
-                Icons.notifications_none_rounded,
-                color: AppColors.blue,
-                size: 23,
-              ),
-            ),
-            Positioned(
-              top: 6,
-              right: 5,
-              child: Container(
-                width: 14,
-                height: 14,
-                alignment: Alignment.center,
-                decoration: const BoxDecoration(
-                  color: AppColors.red,
-                  shape: BoxShape.circle,
-                ),
-                child: const Text(
-                  '3',
-                  style: TextStyle(
-                    color: AppColors.white,
-                    fontSize: 9,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-        Container(
-          width: 32,
-          height: 32,
-          margin: const EdgeInsets.only(left: 4, right: 16),
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: AppColors.softBlue,
-            borderRadius: BorderRadius.circular(11),
-          ),
-          child: const Text(
-            'RK',
-            style: TextStyle(
-              color: AppColors.blue,
-              fontSize: 11,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-        ),
-      ],
+    return ClinicHeader(
+      title: 'Growth & Development',
+      showBackButton: true,
+      onBack: () => Navigator.of(context).pop(),
+      onNotificationTap: () => openNotifications(context),
+      onProfileTap: () => openProfile(context),
     );
   }
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../shared/widgets/clinic_app_bar.dart';
+import '../notification_navigation.dart';
 import '../profile_data.dart';
 import 'child_profile_page.dart';
 import 'growth_development_page.dart';
@@ -178,37 +180,221 @@ class NotificationsPage extends StatefulWidget {
 }
 
 class _NotificationsPageState extends State<NotificationsPage> {
-  bool appointmentAlerts = true;
-  bool healthReminders = true;
-  bool productUpdates = false;
+  final _notifications = <_NotificationItem>[
+    _NotificationItem(
+      icon: Icons.calendar_month_outlined,
+      color: AppColors.softBlue,
+      iconColor: AppColors.blue,
+      title: 'Appointment tomorrow',
+      message: 'Arjun has an appointment with Dr. Elamparithi at 10:30 AM.',
+      time: '2 hours ago',
+    ),
+    _NotificationItem(
+      icon: Icons.vaccines_outlined,
+      color: AppColors.softGreen,
+      iconColor: AppColors.green,
+      title: 'Vaccination reminder',
+      message: 'Ananya’s next vaccination is due this week.',
+      time: 'Yesterday',
+    ),
+    _NotificationItem(
+      icon: Icons.show_chart_rounded,
+      color: AppColors.orangeSoft,
+      iconColor: AppColors.orangeDark,
+      title: 'Growth update available',
+      message: 'New growth measurements were added to Arjun’s profile.',
+      time: '12 Sep 2026',
+    ),
+    _NotificationItem(
+      icon: Icons.favorite_border_rounded,
+      color: AppColors.purpleSoft,
+      iconColor: AppColors.purple,
+      title: 'Health tip for your family',
+      message: 'Small bedtime routines can support better sleep for children.',
+      time: '08 Sep 2026',
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return _ProfileSubpage(
       title: 'Notifications',
       children: [
-        const _PageIntro(
-          title: 'Stay up to date',
-          subtitle: 'Choose which reminders you would like to receive.',
+        Row(
+          children: [
+            const Expanded(
+              child: _PageIntro(
+                title: 'Your updates',
+                subtitle: 'Important reminders and family health updates.',
+              ),
+            ),
+            if (_notifications.any((item) => !item.isRead))
+              TextButton(
+                onPressed: () => setState(() {
+                  for (final item in _notifications) {
+                    item.isRead = true;
+                  }
+                }),
+                child: const Text('Mark all read'),
+              ),
+          ],
         ),
-        _SwitchRow(
-          title: 'Appointment reminders',
-          value: appointmentAlerts,
-          onChanged: (value) => setState(() => appointmentAlerts = value),
-        ),
-        _SwitchRow(
-          title: 'Health reminders',
-          value: healthReminders,
-          onChanged: (value) => setState(() => healthReminders = value),
-        ),
-        _SwitchRow(
-          title: 'Clinic updates',
-          value: productUpdates,
-          onChanged: (value) => setState(() => productUpdates = value),
-        ),
+        _NotificationGroup(items: _notifications, onTap: _markRead),
       ],
     );
   }
+
+  void _markRead(_NotificationItem item) {
+    if (!item.isRead) setState(() => item.isRead = true);
+  }
+}
+
+class _NotificationGroup extends StatelessWidget {
+  const _NotificationGroup({required this.items, required this.onTap});
+
+  final List<_NotificationItem> items;
+  final ValueChanged<_NotificationItem> onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        children: [
+          for (var index = 0; index < items.length; index++) ...[
+            _NotificationTile(
+              item: items[index],
+              onTap: () => onTap(items[index]),
+            ),
+            if (index < items.length - 1)
+              const Divider(
+                height: 1,
+                indent: 66,
+                color: AppColors.borderLight,
+              ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _NotificationTile extends StatelessWidget {
+  const _NotificationTile({required this.item, required this.onTap});
+
+  final _NotificationItem item;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: item.isRead ? AppColors.white : AppColors.bluePale,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(13),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: item.color,
+                  borderRadius: BorderRadius.circular(11),
+                ),
+                child: Icon(item.icon, color: item.iconColor, size: 19),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            item.title,
+                            style: const TextStyle(
+                              color: AppColors.ink,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                        if (!item.isRead) const _UnreadDot(),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      item.message,
+                      style: const TextStyle(
+                        color: AppColors.gray,
+                        fontSize: 11,
+                        height: 1.3,
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      item.time,
+                      style: const TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 10,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 5),
+              const Icon(
+                Icons.chevron_right_rounded,
+                color: AppColors.ink,
+                size: 19,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _UnreadDot extends StatelessWidget {
+  const _UnreadDot();
+
+  @override
+  Widget build(BuildContext context) => Container(
+    width: 7,
+    height: 7,
+    decoration: const BoxDecoration(
+      color: AppColors.blue,
+      shape: BoxShape.circle,
+    ),
+  );
+}
+
+class _NotificationItem {
+  _NotificationItem({
+    required this.icon,
+    required this.color,
+    required this.iconColor,
+    required this.title,
+    required this.message,
+    required this.time,
+  });
+
+  final IconData icon;
+  final Color color;
+  final Color iconColor;
+  final String title;
+  final String message;
+  final String time;
+  bool isRead = false;
 }
 
 class PrivacyPage extends StatelessWidget {
@@ -320,22 +506,12 @@ class _ProfileSubpage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.white,
-        surfaceTintColor: AppColors.white,
-        elevation: 0,
-        leading: IconButton(
-          onPressed: () => Navigator.of(context).pop(),
-          icon: const Icon(Icons.arrow_back_rounded, color: AppColors.blue),
-        ),
-        title: Text(
-          title,
-          style: const TextStyle(
-            color: AppColors.ink,
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
+      appBar: ClinicHeader(
+        title: title,
+        showBackButton: true,
+        onBack: () => Navigator.of(context).pop(),
+        onNotificationTap: () => openNotifications(context),
+        onProfileTap: () => openProfile(context),
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 20, 16, 28),
@@ -672,48 +848,6 @@ class _ActionButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(11),
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _SwitchRow extends StatelessWidget {
-  const _SwitchRow({
-    required this.title,
-    required this.value,
-    required this.onChanged,
-  });
-
-  final String title;
-  final bool value;
-  final ValueChanged<bool> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(13),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              title,
-              style: const TextStyle(
-                color: AppColors.ink,
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-          Switch(
-            value: value,
-            onChanged: onChanged,
-            activeThumbColor: AppColors.blue,
-          ),
-        ],
       ),
     );
   }
